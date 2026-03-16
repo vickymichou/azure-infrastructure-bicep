@@ -1,0 +1,10 @@
+name: Azure Bicep Check
+on: [push]
+
+jobs:
+  check-code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Bicep
+        run: az bicep build --file main.bicep
