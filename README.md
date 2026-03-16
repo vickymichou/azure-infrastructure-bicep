@@ -22,6 +22,4 @@ This project demonstrates my ability to provision cloud resources on **Azure** u
 To deploy this infrastructure, use the Azure CLI:
 ```bash
 az deployment group create --resource-group <YourResourceGroup> --template-file storage.bicep
-To deploy this infrastructure, use the Azure CLI:
-```bash
 az deployment group create --resource-group <YourResourceGroup> --template-file storage.bicep
