@@ -74,3 +74,85 @@ resource lockStorage 'Microsoft.Authorization/locks@2020-05-01' = {
     notes: 'This resource is locked to prevent accidental deletion.'
   }
 }
+
+// === Parameters for VM ===
+@description('Username for the Virtual Machine')
+param adminUsername string = 'azureuser'
+
+@description('Password for the Virtual Machine')
+@secure() // Αυτό κρύβει τον κωδικό από τα logs!
+param adminPassword string
+
+// === Public IP ===
+resource publicIP 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
+  name: 'vm-public-ip'
+  location: location
+  tags: defaultTags
+  sku: {
+    name: 'Basic'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Dynamic'
+  }
+}
+
+// === Network Interface (NIC) ===
+resource nic 'Microsoft.Network/networkInterfaces@2023-05-01' = {
+  name: 'vm-nic'
+  location: location
+  tags: defaultTags
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: {
+            id: publicIP.id
+          }
+          subnet: {
+            id: vnet.properties.subnets[0].id // Συνδέεται με το Subnet που ήδη έχεις
+          }
+        }
+      }
+    ]
+  }
+}
+
+// === Virtual Machine ===
+resource vm 'Microsoft.Network/virtualMachines@2023-09-01' = {
+  name: 'LinuxServer'
+  location: location
+  tags: defaultTags
+  properties: {
+    hardwareProfile: {
+      vmSize: 'Standard_B1s' // Πολύ οικονομικό μέγεθος
+    }
+    osProfile: {
+      computerName: 'linuxserver'
+      adminUsername: adminUsername
+      adminPassword: adminPassword
+    }
+    storageProfile: {
+      imageReference: {
+        publisher: 'Canonical'
+        offer: '0001-com-ubuntu-server-jammy'
+        sku: '22_04-lts'
+        version: 'latest'
+      }
+      osDisk: {
+        createOption: 'FromImage'
+        managedDisk: {
+          storageAccountType: 'Standard_LRS'
+        }
+      }
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: nic.id
+        }
+      ]
+    }
+  }
+}
