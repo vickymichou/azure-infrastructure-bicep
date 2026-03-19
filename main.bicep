@@ -1,31 +1,60 @@
+// === Parameters ===
+@description('The Azure region for all resources.')
+param location string = resourceGroup().location
+
+@description('The name of the Storage Account.')
+param storageName string = 'stg${uniqueString(resourceGroup().id)}'
+
+@description('Username for the Virtual Machine')
+param adminUsername string = 'azureuser'
+
+@description('Password for the Virtual Machine')
+@secure()
+param adminPassword string = 'AzurePass123!' // Default value for validation
+
+// === Variables ===
+var vnetName = 'VNet-Production'
+var subnetName = 'MainSubnet'
+var nsgName = 'NSG-Secure-Traffic'
+var publicIPName = 'VM-Public-IP'
+var nicName = 'VM-NIC'
+var vmName = 'LinuxServer'
+
 var defaultTags = {
   Environment: 'Learning'
-  Project: 'SecureStorage'
-  Owner: 'CloudEngineer' // 
+  Project: 'SecureInfrastructure'
+  DeployedBy: 'CloudEngineer'
 }
 
-// Αντί για σταθερά ονόματα, χρησιμοποιούμε μεταβλητές
-// Parameters
-param location string = 'westeurope'
-param storageName string = 'stjunior${uniqueString(resourceGroup().id)}'
-param vnetName string = 'VNet-Project-Secure'
-
-// --- NETWORK SECURITY GROUP (Firewall) ---
-// Αυτό ορίζει ποιος επιτρέπεται να "μπει" στο δίκτυο
-resource nsg 'Microsoft.Network/networkSecurityGroups@2023-04-01' = {
-  name: 'MyNetwork-FG'
+// === Network Security Group (NSG) ===
+resource nsg 'Microsoft.Network/networkSecurityGroups@2023-05-01' = {
+  name: nsgName
   location: location
+  tags: defaultTags
   properties: {
     securityRules: [
       {
-        name: 'AllowHTTP'
+        name: 'AllowSSHInbound'
         properties: {
           priority: 100
-          access: 'Allow'
           direction: 'Inbound'
+          access: 'Allow'
           protocol: 'Tcp'
           sourcePortRange: '*'
-          destinationPortRange: '80' // Επιτρέπουμε την κίνηση Web
+          destinationPortRange: '22' // SSH Port
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+        }
+      }
+      {
+        name: 'AllowHTTPInbound'
+        properties: {
+          priority: 110
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '80'
           sourceAddressPrefix: '*'
           destinationAddressPrefix: '*'
         }
@@ -34,29 +63,20 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2023-04-01' = {
   }
 }
 
-// --- STORAGE ACCOUNT ---
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: storageName
-  location: location
-  tags: defaultTags //
-  sku: { name: 'Standard_LRS' }
-  kind: 'StorageV2'
-}
-
-// --- VIRTUAL NETWORK ---
-resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
+// === Virtual Network & Subnet ===
+resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
   name: vnetName
   location: location
+  tags: defaultTags
   properties: {
     addressSpace: {
       addressPrefixes: ['10.0.0.0/16']
     }
     subnets: [
       {
-        name: 'MainSubnet'
+        name: subnetName
         properties: {
           addressPrefix: '10.0.1.0/24'
-          // Εδώ συνδέουμε το Firewall (NSG) με το Subnet!
           networkSecurityGroup: {
             id: nsg.id
           }
@@ -66,31 +86,12 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   }
 }
 
-resource lockStorage 'Microsoft.Authorization/locks@2020-05-01' = {
-  name: 'PreventDelete'
-  scope: storageAccount // Συνδέεται με το όνομα που έδωσες στο storage resource
-  properties: {
-    level: 'CanNotDelete'
-    notes: 'This resource is locked to prevent accidental deletion.'
-  }
-}
-
-// === Parameters for VM ===
-@description('Username for the Virtual Machine')
-param adminUsername string = 'azureuser'
-
-@description('Password for the Virtual Machine')
-@secure() // Αυτό κρύβει τον κωδικό από τα logs!
-param adminPassword string
-
-// === Public IP ===
+// === Public IP Address ===
 resource publicIP 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
-  name: 'vm-public-ip'
+  name: publicIPName
   location: location
   tags: defaultTags
-  sku: {
-    name: 'Basic'
-  }
+  sku: { name: 'Basic' }
   properties: {
     publicIPAllocationMethod: 'Dynamic'
   }
@@ -98,7 +99,7 @@ resource publicIP 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
 
 // === Network Interface (NIC) ===
 resource nic 'Microsoft.Network/networkInterfaces@2023-05-01' = {
-  name: 'vm-nic'
+  name: nicName
   location: location
   tags: defaultTags
   properties: {
@@ -107,27 +108,21 @@ resource nic 'Microsoft.Network/networkInterfaces@2023-05-01' = {
         name: 'ipconfig1'
         properties: {
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIP.id
-          }
-          subnet: {
-            id: vnet.properties.subnets[0].id // Συνδέεται με το Subnet που ήδη έχεις
-          }
+          publicIPAddress: { id: publicIP.id }
+          subnet: { id: vnet.properties.subnets[0].id }
         }
       }
     ]
   }
 }
 
-// === Virtual Machine ===
+// === Virtual Machine (Ubuntu Linux) ===
 resource vm 'Microsoft.Network/virtualMachines@2023-09-01' = {
-  name: 'LinuxServer'
+  name: vmName
   location: location
   tags: defaultTags
   properties: {
-    hardwareProfile: {
-      vmSize: 'Standard_B1s' // Πολύ οικονομικό μέγεθος
-    }
+    hardwareProfile: { vmSize: 'Standard_B1s' }
     osProfile: {
       computerName: 'linuxserver'
       adminUsername: adminUsername
@@ -142,17 +137,33 @@ resource vm 'Microsoft.Network/virtualMachines@2023-09-01' = {
       }
       osDisk: {
         createOption: 'FromImage'
-        managedDisk: {
-          storageAccountType: 'Standard_LRS'
-        }
+        managedDisk: { storageAccountType: 'Standard_LRS' }
       }
     }
     networkProfile: {
-      networkInterfaces: [
-        {
-          id: nic.id
-        }
-      ]
+      networkInterfaces: [{ id: nic.id }]
     }
+  }
+}
+
+// === Storage Account ===
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+  name: storageName
+  location: location
+  tags: defaultTags
+  sku: { name: 'Standard_LRS' }
+  kind: 'StorageV2'
+  properties: {
+    supportsHttpsTrafficOnly: true
+  }
+}
+
+// === Resource Lock (Storage) ===
+resource lockStorage 'Microsoft.Authorization/locks@2020-05-01' = {
+  name: 'PreventDeleteStorage'
+  scope: storageAccount
+  properties: {
+    level: 'CanNotDelete'
+    notes: 'Locked to prevent accidental deletion.'
   }
 }
