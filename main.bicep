@@ -170,3 +170,32 @@ resource lockStorage 'Microsoft.Authorization/locks@2020-05-01' = {
     notes: 'Locked to prevent accidental deletion.'
   }
 }
+
+// =====================================================
+// === SECTION: ADVANCED SECURITY (Key Vault) ===
+// =====================================================
+
+@description('Azure Key Vault for centralized secrets management')
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
+  name: 'kv-${uniqueString(resourceGroup().id)}'
+  location: location
+  properties: {
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    tenantId: subscription().tenantId
+    accessPolicies: [] 
+    enabledForDeployment: true 
+    enabledForTemplateDeployment: true
+  }
+}
+
+@description('Stores the VM Admin Password as a secure secret')
+resource vaultSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'adminPassword'
+  properties: {
+    value: adminPassword
+  }
+}
