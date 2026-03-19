@@ -1,4 +1,11 @@
+var defaultTags = {
+  Environment: 'Learning'
+  Project: 'SecureStorage'
+  Owner: 'CloudEngineer' // 
+}
+
 // Αντί για σταθερά ονόματα, χρησιμοποιούμε μεταβλητές
+// Parameters
 param location string = 'westeurope'
 param storageName string = 'stjunior${uniqueString(resourceGroup().id)}'
 param vnetName string = 'VNet-Project-Secure'
@@ -31,6 +38,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2023-04-01' = {
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageName
   location: location
+  tags: defaultTags //
   sku: { name: 'Standard_LRS' }
   kind: 'StorageV2'
 }
@@ -55,5 +63,14 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
         }
       }
     ]
+  }
+}
+
+resource lockStorage 'Microsoft.Authorization/locks@2020-05-01' = {
+  name: 'PreventDelete'
+  scope: storageAccount // Συνδέεται με το όνομα που έδωσες στο storage resource
+  properties: {
+    level: 'CanNotDelete'
+    notes: 'This resource is locked to prevent accidental deletion.'
   }
 }
