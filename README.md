@@ -1,32 +1,35 @@
-# ☁️ Secure Azure Infrastructure with Bicep & GitHub Actions
+# ☁️ Secure Azure IaaS Infrastructure with Bicep & CI/CD
 
-![Architecture Diagram](architecture.drawio.png)
+![Architecture Diagram](architecture.png)
 
 ## 🎯 Project Overview
-This project demonstrates a professional **Infrastructure as Code (IaC)** workflow. I have designed a secure, multi-resource Azure environment using **Bicep** and automated the validation process through a **CI/CD pipeline**.
+This project demonstrates an enterprise-grade **Infrastructure as Code (IaC)** workflow. I have designed and deployed a secure, multi-tier Azure environment featuring a Linux Virtual Machine, custom networking, and persistent storage, all validated via a **GitHub Actions CI pipeline**.
 
 ## 🏗 Architecture Components
-- **Virtual Network (VNet):** A private network space (10.0.0.0/16) for cloud resources.
-- **Secure Subnet:** A segmented portion of the network (10.0.1.0/24).
-- **Network Security Group (NSG):** A built-in firewall with a custom rule to **Allow HTTP (Port 80)** traffic while blocking unauthorized access.
-- **Storage Account:** Configured with `Standard_LRS` for cost-effective data redundancy.
-- **Resource Tagging:** Enterprise-level tagging for cost management and organization.
-- **Resource Locking:** Implementation of `CanNotDelete` lock to prevent accidental resource deletion.
+- **Compute (Virtual Machine):** An Ubuntu Linux server (`Standard_B1s`) configured for secure access.
+- **Networking:** - **VNet (10.0.0.0/16):** A private isolated network.
+  - **Secure Subnet (10.0.1.0/24):** A dedicated segment for infrastructure resources.
+  - **Public IP & NIC:** Configured to provide controlled external connectivity to the VM.
+- **Security (NSG):** Firewall rules implementing the principle of least privilege:
+  - **Port 22 (SSH):** For secure remote management.
+  - **Port 80 (HTTP):** For web traffic.
+- **Storage:** Azure Storage Account with **HTTPS-only** enforcement and **LRS** redundancy for data persistence.
+- **Governance & Protection:** - **Resource Tags:** For cost tracking and organization.
+  - **Resource Locks:** `CanNotDelete` lock applied to critical storage components.
 
-## 🛠 Tech Stack & Skills
+## 🛠 Tech Stack
 - **Cloud Provider:** Microsoft Azure
 - **IaC Tool:** Azure Bicep (Modular & Declarative)
-- **CI/CD:** GitHub Actions (Automated Linting & Validation)
-- **Security:** Network traffic filtering and Secure-by-Design principles.
-- **Governance:** Azure Resource Locks & Tagging.
-  
-## 🚀 CI/CD Workflow (Continuous Integration)
-The project includes a GitHub Actions workflow (`main.yml`) that:
-1. Triggers automatically on every **Git Push**.
-2. Provisions a temporary **Linux (Ubuntu)** environment.
-3. Executes `az bicep build` to perform **Static Analysis** and ensure the code is error-free before deployment.
+- **CI/CD:** GitHub Actions (Automated Linting & Static Analysis)
+- **Security:** Network Security Groups (NSG) & Secure Parameter Handling (`@secure`).
 
-## 🔧 Deployment
-To deploy this infrastructure after the CI check passes, use the Azure CLI:
+## 🚀 CI/CD Workflow
+Every "Push" to the main branch triggers a GitHub Action that:
+1. Provisions a temporary environment.
+2. Installs the Azure Bicep CLI.
+3. Performs a `bicep build` to validate the syntax and integrity of the infrastructure code.
+
+## 🔧 How to Deploy
+To deploy this infrastructure, use the following Azure CLI command:
 ```bash
-az deployment group create --resource-group <YourRG> --template-file main.bicep
+az deployment group create --resource-group <YourResourceGroupName> --template-file main.bicep
