@@ -18,7 +18,7 @@ This project demonstrates an enterprise-grade **Infrastructure as Code (IaC)** w
   - **Resource Locks:** `CanNotDelete` lock applied to critical storage components.
 
 ## 🛡️ Security & AI Analyst Focus
-As a **Security Analyst**, I implemented specific controls to ensure this infrastructure can safely host **AI models** and sensitive data:
+I implemented specific controls to ensure this infrastructure can safely host **AI models** and sensitive data:
 * **🔐 Zero-Trust Secret Management:** Integrated **Azure Key Vault** logic and `@secure()` decorators to decouple sensitive credentials from the deployment logic. This ensures that the Ubuntu VM retrieves its administrative password securely at runtime, preventing secret leakage in source control.
 * **🛰️ Micro-Segmentation & Network Hardening:** Implemented **IP Whitelisting** via Network Security Groups (NSG). By restricting SSH (Port 22) to a specific Administrative IP, I effectively eliminated the attack surface for Brute Force and Unauthorized Access.
 * **🤖 AI Model Integrity (Inference Node):** Designed as a **Secure Inference Node** to protect ML models from unauthorized exfiltration (**Model Stealing**) or **Data Poisoning** by isolating the compute resource within a dedicated Virtual Network trust boundary.
