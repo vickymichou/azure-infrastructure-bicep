@@ -1,24 +1,27 @@
-# Azure Infrastructure Deployment with Bicep & GitHub Actions
+# ☁️ Secure Azure Infrastructure with Bicep & GitHub Actions
 
-## 🎯 Overview
-This project demonstrates my ability to provision cloud resources on **Azure** using **Infrastructure as Code (IaC)**. It automates the deployment process and ensures code quality through a **CI/CD pipeline**.
+## 🎯 Project Overview
+This project demonstrates a professional **Infrastructure as Code (IaC)** workflow. I have designed a secure, multi-resource Azure environment using **Bicep** and automated the validation process through a **CI/CD pipeline**.
 
-## 🛠 Tech Stack
+## 🏗 Architecture Components
+- **Virtual Network (VNet):** A private network space (10.0.0.0/16) for cloud resources.
+- **Secure Subnet:** A segmented portion of the network (10.0.1.0/24).
+- **Network Security Group (NSG):** A built-in firewall with a custom rule to **Allow HTTP (Port 80)** traffic while blocking unauthorized access.
+- **Storage Account:** Configured with `Standard_LRS` for cost-effective data redundancy.
+
+## 🛠 Tech Stack & Skills
 - **Cloud Provider:** Microsoft Azure
-- **IaC Tool:** Bicep
-- **CI/CD:** GitHub Actions
-- **Version Control:** Git
+- **IaC Tool:** Azure Bicep (Modular & Declarative)
+- **CI/CD:** GitHub Actions (Automated Linting & Validation)
+- **Security:** Network traffic filtering and Secure-by-Design principles.
 
-## 🏗 Project Structure
-- `storage.bicep`: Defines an Azure Storage Account with specific configurations (LRS, Hot Tier).
-- `.github/workflows/main.yml`: A GitHub Actions workflow that automatically validates the Bicep code (Linting) on every push.
+## 🚀 CI/CD Workflow (Continuous Integration)
+The project includes a GitHub Actions workflow (`main.yml`) that:
+1. Triggers automatically on every **Git Push**.
+2. Provisions a temporary **Linux (Ubuntu)** environment.
+3. Executes `az bicep build` to perform **Static Analysis** and ensure the code is error-free before deployment.
 
-## 🚀 Key Learning Outcomes
-- Understanding of **Azure Resource Providers**.
-- Practical experience with **Declarative Syntax** in Bicep.
-- Implementation of **Continuous Integration (CI)** to catch configuration errors early.
-
-## 🔧 How to run
-To deploy this infrastructure, use the Azure CLI:
+## 🔧 Deployment
+To deploy this infrastructure after the CI check passes, use the Azure CLI:
 ```bash
-az deployment group create --resource-group <YourResourceGroup> --template-file storage.bicep
+az deployment group create --resource-group <YourRG> --template-file main.bicep
