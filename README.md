@@ -1,6 +1,6 @@
 # ☁️ Secure Azure IaaS Infrastructure with Bicep & CI/CD
 
-![Architecture Diagram](architecture.png)
+![Architecture Diagram](architecture.drawio.png)
 
 ## 🎯 Project Overview
 This project demonstrates an enterprise-grade **Infrastructure as Code (IaC)** workflow. I have designed and deployed a secure, multi-tier Azure environment featuring a Linux Virtual Machine, custom networking, and persistent storage, all validated via a **GitHub Actions CI pipeline**.
