@@ -19,9 +19,10 @@ This project demonstrates an enterprise-grade **Infrastructure as Code (IaC)** w
 
 ## 🛡️ Security & AI Analyst Focus
 As a **Security Analyst**, I implemented specific controls to ensure this infrastructure can safely host **AI models** and sensitive data:
-- **Secrets Management:** Use of `@secure()` decorators and parameters to avoid hardcoded credentials in the codebase.
-- **Attack Surface Reduction:** Minimized open ports and implemented inbound filtering.
-- **AI Readiness:** Designed as a **Secure Inference Node** to protect ML models from unauthorized exfiltration or tampering.
+* **🔐 Zero-Trust Secret Management:** Integrated **Azure Key Vault** logic and `@secure()` decorators to decouple sensitive credentials from the deployment logic. This ensures that the Ubuntu VM retrieves its administrative password securely at runtime, preventing secret leakage in source control.
+* **🛰️ Micro-Segmentation & Network Hardening:** Implemented **IP Whitelisting** via Network Security Groups (NSG). By restricting SSH (Port 22) to a specific Administrative IP, I effectively eliminated the attack surface for Brute Force and Unauthorized Access.
+* **🤖 AI Model Integrity (Inference Node):** Designed as a **Secure Inference Node** to protect ML models from unauthorized exfiltration (**Model Stealing**) or **Data Poisoning** by isolating the compute resource within a dedicated Virtual Network trust boundary.
+* **⚖️ Governance & Immutability:** Applied **Resource Locks** and **Resource Tagging** to ensure infrastructure persistence and prevent accidental **configuration drift** or unauthorized deletion of AI data volumes.
 
 ## 🛠 Tech Stack
 - **Cloud Provider:** Microsoft Azure
