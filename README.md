@@ -1,6 +1,5 @@
 # ☁️ Secure Azure IaaS Infrastructure with Bicep & CI/CD
 
-//Αρχιτεκτονική Δικτύου
 ![Architecture Diagram](architecture.drawio.png)
 
 ## 🎯 Project Overview
