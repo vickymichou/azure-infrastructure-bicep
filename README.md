@@ -1,5 +1,7 @@
 # ☁️ Secure Azure Infrastructure with Bicep & GitHub Actions
 
+![Architecture Diagram](architecture.drawio.png)
+
 ## 🎯 Project Overview
 This project demonstrates a professional **Infrastructure as Code (IaC)** workflow. I have designed a secure, multi-resource Azure environment using **Bicep** and automated the validation process through a **CI/CD pipeline**.
 
