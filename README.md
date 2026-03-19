@@ -10,13 +10,16 @@ This project demonstrates a professional **Infrastructure as Code (IaC)** workfl
 - **Secure Subnet:** A segmented portion of the network (10.0.1.0/24).
 - **Network Security Group (NSG):** A built-in firewall with a custom rule to **Allow HTTP (Port 80)** traffic while blocking unauthorized access.
 - **Storage Account:** Configured with `Standard_LRS` for cost-effective data redundancy.
+- **Resource Tagging:** Enterprise-level tagging for cost management and organization.
+- **Resource Locking:** Implementation of `CanNotDelete` lock to prevent accidental resource deletion.
 
 ## 🛠 Tech Stack & Skills
 - **Cloud Provider:** Microsoft Azure
 - **IaC Tool:** Azure Bicep (Modular & Declarative)
 - **CI/CD:** GitHub Actions (Automated Linting & Validation)
 - **Security:** Network traffic filtering and Secure-by-Design principles.
-
+- **Governance:** Azure Resource Locks & Tagging.
+  
 ## 🚀 CI/CD Workflow (Continuous Integration)
 The project includes a GitHub Actions workflow (`main.yml`) that:
 1. Triggers automatically on every **Git Push**.
