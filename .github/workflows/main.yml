@@ -1,10 +1,19 @@
-name: Azure Bicep Check
-on: [push]
+name: Bicep CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  check-code:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Validate Bicep
+      - uses: actions/checkout@v3
+
+      - name: Install Bicep
+        run: az bicep install
+
+      - name: Run Bicep Build
         run: az bicep build --file main.bicep
