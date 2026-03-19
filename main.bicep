@@ -12,6 +12,9 @@ param adminUsername string = 'azureuser'
 @secure()
 param adminPassword string = 'AzurePass123!' // Default value for validation
 
+@description('The Public IP address of the administrator for SSH whitelisting.')
+param adminIP string = '1.2.3.4/32' // Placeholder: Replace with your actual Admin IP
+
 // === Variables ===
 var vnetName = 'VNet-Production'
 var subnetName = 'MainSubnet'
@@ -42,7 +45,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2023-05-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '22' // SSH Port
-          sourceAddressPrefix: '*'
+          sourceAddressPrefix: adminIP
           destinationAddressPrefix: '*'
         }
       }
@@ -55,7 +58,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2023-05-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '80'
-          sourceAddressPrefix: '*'
+          sourceAddressPrefix: '*' // Το HTTP (Web) το αφήνουμε ανοιχτό σε όλους
           destinationAddressPrefix: '*'
         }
       }
