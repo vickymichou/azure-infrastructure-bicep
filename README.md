@@ -27,3 +27,5 @@ The project includes a GitHub Actions workflow (`main.yml`) that:
 To deploy this infrastructure after the CI check passes, use the Azure CLI:
 ```bash
 az deployment group create --resource-group <YourRG> --template-file main.bicep
+```bash
+az deployment group create --resource-group <YourRG> --template-file main.bicep
