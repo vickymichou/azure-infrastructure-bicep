@@ -17,6 +17,12 @@ This project demonstrates an enterprise-grade **Infrastructure as Code (IaC)** w
 - **Governance & Protection:** - **Resource Tags:** For cost tracking and organization.
   - **Resource Locks:** `CanNotDelete` lock applied to critical storage components.
 
+## 🛡️ Security & AI Analyst Focus
+As a **Security Analyst**, I implemented specific controls to ensure this infrastructure can safely host **AI models** and sensitive data:
+- **Secrets Management:** Use of `@secure()` decorators and parameters to avoid hardcoded credentials in the codebase.
+- **Attack Surface Reduction:** Minimized open ports and implemented inbound filtering.
+- **AI Readiness:** Designed as a **Secure Inference Node** to protect ML models from unauthorized exfiltration or tampering.
+
 ## 🛠 Tech Stack
 - **Cloud Provider:** Microsoft Azure
 - **IaC Tool:** Azure Bicep (Modular & Declarative)
